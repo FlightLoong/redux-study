@@ -11,26 +11,29 @@ class Todos extends React.Component {
     this.state = {
       isAll: false,
       etitle: '',
+      currentType: 'all',
       todos: [
         {
           id: 1,
           etitle: '写代码',
-          done: false
+          done: false,
+          isEdit: false
         },
         {
           id: 2,
           etitle: '听音乐',
-          done: true
+          done: true,
+          isEdit: false
         }
       ]
     }
 
-    this.focusFef = React.createRef()
+    this.focusRef = React.createRef()
   }
 
   componentDidMount() {
     // 自定义光标聚焦
-    this.focusFef.current.focus()
+    this.focusRef.current.focus()
   }
 
   // 输入最新的任务
@@ -46,7 +49,8 @@ class Todos extends React.Component {
       let newTodo = {
         id: maxId,
         etitle: this.state.etitle,
-        done: false
+        done: false,
+        isEdit: false
       }
 
       this.setState({
@@ -95,6 +99,47 @@ class Todos extends React.Component {
     })
   }
 
+  // 双击任务列表
+  handleDoubleClick = (id, e) => {
+    console.log(e)
+    let input = e.target.parentNode.nextSibling
+    // e.persist()
+    setTimeout(() => {
+      input && input.focus()
+    }, 0)
+    // 双击进入编辑状态;或者失去焦点是，取消编辑状态
+    let todos = [...this.state.todos]
+    todos.some(item => {
+      if (item.id === id) {
+        // 找到后把对应isEdit状态取反
+        item.isEdit = !item.isEdit
+        // 终止继续遍历
+        return true
+      }
+      return false
+    })
+    this.setState({
+      todos: todos
+    })
+  }
+
+  // 完成任务的编辑
+  handleEditEtile = (id, e) => {
+    // 控制数组中对应标题的变化
+    let todos = [...this.state.todos]
+    todos.some(item => {
+      if (item.id === id) {
+        // 把最新的输入内容进行更新
+        item.etitle = e.target.value
+        return true
+      }
+      return false
+    })
+    this.setState({
+      todos: todos
+    })
+  }
+
   // 切换状态
   handleCheck = (id) => {
     let todos = [...this.state.todos]
@@ -112,28 +157,84 @@ class Todos extends React.Component {
     })
   }
 
+  // 计算数量
+  handleCount = () => {
+    // 计算剩余的没有完成的任务数量
+    let num = 0
+    this.state.todos.forEach(item => {
+      if (!item.done) {
+        // 没有完成的任务
+        num += 1
+      }
+    })
+    return num
+  }
+
+  // 获取选中的值
+  handleFilter = (e) => {
+    // 更新当前的筛选条件
+    let id = e.target.dataset.id
+    if (!id) {
+      // 没有id，什么都不做
+      return 
+    }
+    this.setState({
+      currentType: id
+    })
+  }
+
+  // 筛选数据
+  handleFilterData = () => {
+    let { todos, currentType } = this.state
+    return todos.filter(item => {
+      if (currentType === 'all') {
+        // 全部列表
+        return true
+      } else if (currentType === 'will' && !item.done) {
+        // 未完成
+        return true
+      } else if (currentType === 'done' && item.done) {
+        return true
+      } else {
+        return false
+      }
+    })
+  }
+
+  // 清除已完成的
+  handleClearAll = () => {
+    // 清除所有的已完成任务
+    let todos = this.state.todos.filter(item => {
+      return !item.done
+    })
+    this.setState({
+      todos: todos
+    })
+  }
+
   // 渲染 todolist 列表
   todoTags = () => {
-    return this.state.todos.map(item => (
-      <li key={item.id} className={item.done ? 'completed' : ''}>
-        <div className="view">
+    let todos = this.handleFilterData()
+    return todos.map(item => (
+      <li key={item.id} className={[item.done ? 'completed' : '', item.isEdit ? 'editing' : ''].join(' ')}>
+        <div className="view" onDoubleClick={this.handleDoubleClick.bind(this, item.id)}>
           <input onChange={() => this.handleCheck(item.id)} checked={item.done} className="toggle" type="checkbox" />
           <label>{item.etitle}</label>
           <button onClick={() => this.deleteTodo(item.id)} className="destroy"></button>
         </div>
-        <input className="edit" />
+        <input className="edit" value={item.etitle} onChange={this.handleEditEtile.bind(this, item.id)} onBlur={this.handleDoubleClick.bind(this, item.id)} />
       </li>
     ))
   }
 
   render() {
-    const { etitle } = this.state
+    const { etitle, currentType } = this.state
     return (
       <div>
         <section className="todoapp">
           <header className="header">
             <h1>todos</h1>
-            <input value={etitle} onChange={this.valueChange} onKeyUp={this.onKeyUpHandle} className="new-todo" placeholder="你想做什么 ?" ref={this.focusFef} />
+            <input value={etitle} onChange={this.valueChange} onKeyUp={this.onKeyUpHandle} className="new-todo" placeholder="你想做什么 ?" ref={this.focusRef} />
           </header>
 
           <section className="main">
@@ -145,19 +246,19 @@ class Todos extends React.Component {
           </section>
 
           <footer className="footer">
-            <span className="todo-count">剩余 <strong>0</strong> 个任务</span>
-            <ul className="filters">
+            <span className="todo-count">剩余 <strong>{this.handleCount()}</strong> 个任务</span>
+            <ul onClick={this.handleFilter} className="filters">
               <li>
-                <a className="selected" href="#/">全选</a>
+                <a data-id='all' className={currentType==='all'?'selected': ''} href="#/">全选</a>
               </li>
               <li>
-                <a href="#/active">未完成</a>
+                <a data-id='will' className={currentType==='will'?'selected': ''}  href="#/active">未完成</a>
               </li>
               <li>
-                <a href="#/completed">已完成</a>
+                <a data-id='done' className={currentType==='done'?'selected': ''}  href="#/completed">已完成</a>
               </li>
             </ul>
-            <button className="clear-completed">清除</button>
+            <button onClick={this.handleClearAll} className="clear-completed">清除</button>
           </footer>
         </section>
 
