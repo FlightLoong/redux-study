@@ -2,97 +2,42 @@
  * Reducer 复制数据变更操作
  */
 import * as ActionTypes from './ActionTypes.js'
+import * as service from './Service.js'
 
 export default (state, action) => {
-  let newState = null
   switch (action.type) {
     case ActionTypes.TODOS_ADD:
-      newState = JSON.parse(JSON.stringify(state))
-
-      let ids = newState.todos.map(item => {
-        return item.id
-      })
-
-      let maxId = Math.max.apply(null, ids) + 1
-
-      let newTodo = {
-        id: maxId,
-        etitle: action.etitle,
-        done: false,
-        isEdit: false
-      }
-
-      newState.todos.unshift(newTodo)
-      return newState
+      // 添加任务
+      return service.add(state, action)
     case ActionTypes.TODOS_DELETE:
       // 删除任务
-      newState = JSON.parse(JSON.stringify(state))
-      // 找到需要删除的索引
-      let index = newState.todos.findIndex(item => {
-        return item.id === action.id
-      })
-
-      newState.todos.splice(index, 1)
-      return newState
+      return service.deleteTask(state, action)
 
     case ActionTypes.TODOS_TOGGLE_ITEM:
-      newState = JSON.parse(JSON.stringify(state))
-      newState.todos.some(item => {
-        if (item.id === action.id) {
-          item.done = !item.done
-          return true
-        }
-        return false
-      })
-      return newState
+      // 切换单个条目的状态
+      return service.toggleItem(state, action)
 
     case ActionTypes.TODOS_TOGGLE_ALL:
-      newState = JSON.parse(JSON.stringify(state))
-      newState.todos.forEach(item => {
-        item.done = !action.isAll
-      })
-      return newState
+      // 控制所有列表项切换:
+      return service.toggleAll(state, action)
 
     case ActionTypes.TODOS_SHOW_EDIT_INPUT:
-      newState = JSON.parse(JSON.stringify(state))
-      newState.todos.some(item => {
-        if (item.id === action.id) {
-          item.isEdit = !item.isEdit
-          return true
-        }
-        return false
-      })
-      return newState
+      // 显示编辑框
+      return service.showEditInput(state, action)
 
     case ActionTypes.TODOS_EDIT_ETITLE:
-      newState = JSON.parse(JSON.stringify(state))
-      newState.todos.some(item => {
-        if (item.id === action.id) {
-          item.etitle = action.value
-          return true
-        }
-        return false
-      })
-      return newState
+      // 编辑任务名称
+      return service.editEtile(state, action)
 
     case ActionTypes.TODOS_TOGGLE_TYPE:
-      newState = JSON.parse(JSON.stringify(state))
-      newState.currentType = action.value
-
-      return newState
+      // 切换筛选条件
+      return service.toggleType(state, action)
 
     case ActionTypes.TODOS_CLEAR_ALL:
-      newState = JSON.parse(JSON.stringify(state))
-      // console.log(newState)
-      newState.todos = newState.todos.filter(item => {
-        return !item.done
-      })
-
-
-      return newState
+      // 清除已完成任务
+      return service.clearAll(state, action)
 
     default:
       return state
   }
-  // return state
 }
