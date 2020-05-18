@@ -2,50 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as Actions from './store/ActionCreate.js'
 
+
 class List extends React.Component {
 
   state = {
     isAll: false
   }
-
-  // 删除任务列表
-  deleteHandle = (id) => {
-    this.props.deleteTask(id)
-  }
-
-  // 切换状态
-  checkHandle = (id) => {
-    this.props.checkTask(id)
-  }
-
-  // 状态切换
-  toggleAll = () => {
-    // 顶部全选按钮
-    this.setState({
-      isAll: !this.state.isAll
-    }, () => {
-      // 控制所有的列表的选中状态
-      this.props.toggleAllTask(this.state.isAll)
-    })
-  }
-
-  handleDoubleClick = (id, e) => {
-    // 双击之后进入编辑状态
-    // 获取label元素的父元素的下一个兄弟元素 input
-    let input = e.target.parentNode.nextSibling
-    // 调用父组件函数修改任务编辑状态
-    this.props.showEditInput(id)
-    setTimeout(() => {
-      // 页面已经显示input元素之后才控制获取焦点
-      input && input.focus()
-    }, 0)
-  }
-
-  handleEditEtile = (id, e) => {
-    // 控制数组中对应标题的变化
-    this.props.editTask(id, e.target.value)
-  }
-
   // 渲染 todolist 列表
   todoTags = () => {
     const { todos, deleteTask, toggleItem, showEditInput, editEtitle } = this.props
@@ -78,13 +40,33 @@ class List extends React.Component {
   }
 }
 
+// 过滤列表数据
+function filterList({ todos, currentType }) {
+  // let { todos } = this.state
+  return todos.filter(item => {
+    if (currentType === 'all') {
+      // 全部列表
+      return true
+    } else if (currentType === 'will' && !item.done) {
+      // 未完成
+      return true
+    } else if (currentType === 'done' && item.done) {
+      return true
+    } else {
+      return false
+    }
+  })
+}
+
 function mapStateToProps(state) {
   // every 方法：判断数组中是否所有元素都满足条件，如果都满足就返回 true
   let isAll = state.todos.every(item => {
     return item.done
   })
+
+  let todos = filterList(state)
   return {
-    todos: state.todos,
+    todos,
     // 从唯一的数据源中获取状态数据即可
     isAll
   }

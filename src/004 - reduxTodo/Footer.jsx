@@ -1,52 +1,60 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import * as Actions from './store/ActionCreate.js'
 
-export default class Footer extends React.Component {
-  state = {
-    currentType: 'all'
-  }
-
-  // 筛选
-  handleFilter = (e) => {
-    // 更新当前的筛选条件
-    let id = e.target.dataset.id
-    if (!id) {
-      // 没有id，什么都不做
-      return
-    }
-    this.setState({
-      currentType: id
-    })
-    // 对列表数据进行过滤
-    this.props.handleFilter(id)
-  }
-
-  // 清除所有
-  handleClearAll = () => {
-    // 清除所有的已完成任务
-    this.props.clearAll()
-  }
-
+class Footer extends React.Component {
   render() {
-    let { num } = this.props
-    let { currentType } = this.state
+    let { num, currentType, toggleType, clearAll } = this.props
+    // let { currentType } = this.state
     return (
       <div>
         <footer className="footer">
           <span className="todo-count">剩余 <strong>{num}</strong> 个任务</span>
-          <ul onClick={this.handleFilter} className="filters">
+          <ul onClick={toggleType} className="filters">
             <li>
-              <a data-id='all' className={currentType === 'all' ? 'selected' : ''} href="#/">全选</a>
+              <a data-type='all' className={currentType === 'all' ? 'selected' : ''} href="#/">全选</a>
             </li>
             <li>
-              <a data-id='will' className={currentType === 'will' ? 'selected' : ''} href="#/active">未完成</a>
+              <a data-type='will' className={currentType === 'will' ? 'selected' : ''} href="#/active">未完成</a>
             </li>
             <li>
-              <a data-id='done' className={currentType === 'done' ? 'selected' : ''} href="#/completed">已完成</a>
+              <a data-type='done' className={currentType === 'done' ? 'selected' : ''} href="#/completed">已完成</a>
             </li>
           </ul>
-          <button onClick={this.handleClearAll} className="clear-completed">清除所有已完成任务</button>
+          <button onClick={clearAll} className="clear-completed">清除所有已完成任务</button>
         </footer>
       </div>
     )
   }
 }
+
+function mapStateToProps (state) {
+  let num = 0
+  state.todos.forEach(item => {
+    if (!item.done) {
+      num += 1
+    }
+  })
+  return {
+    num,
+    currentType: state.currentType
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    toggleType: (e) => {
+      let type = e.target.dataset.type
+      let action = Actions.toggleTypeAction(type)
+      // console.log(action)
+      dispatch(action)
+    },
+
+    clearAll: () => {
+      let action = Actions.clearAllAction()
+      dispatch(action)
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Footer)

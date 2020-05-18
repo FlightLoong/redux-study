@@ -5,6 +5,7 @@ import { createStore } from 'redux'
 import reducer from './Reducer.js'
 
 let initValue = {
+  currentType: 'all',
   todos: [
     {
       id: 1,

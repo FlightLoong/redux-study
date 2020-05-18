@@ -3,46 +3,60 @@
  * 
  * Action 的本质是一个普通对象
  */
+import * as ActionTypes from './ActionTypes.js'
 
 export const addTaskAction = (etitle) => {
   return {
-    type: 'todos_add',
+    type: ActionTypes.TODOS_ADD,
     etitle: etitle
   }
 }
 
 export const deleteTaskAction = (id) => {
   return {
-    type: 'todos_delete',
+    type: ActionTypes.TODOS_DELETE,
     id: id
   }
 }
 
 export const toggleItemAction = (id) => {
   return {
-    type: 'todos_toggle_item',
+    type: ActionTypes.TODOS_TOGGLE_ITEM,
     id: id
   }
 }
 
 export const toggleAllAction = (isAll) => {
   return {
-    type: 'todos_toggle_all',
+    type: ActionTypes.TODOS_TOGGLE_ALL,
     isAll
   }
 }
 
 export const showEditInputAction = (id) => {
   return {
-    type: 'todos_show_edit_input',
+    type: ActionTypes.TODOS_SHOW_EDIT_INPUT,
     id
   }
 }
 
 export const editEtitleAction = (id, value) => {
   return {
-    type: 'todos_edit_etitle',
+    type: ActionTypes.TODOS_EDIT_ETITLE,
     id,
     value
+  }
+}
+
+export const toggleTypeAction = (type) => {
+  return {
+    type: ActionTypes.TODOS_TOGGLE_TYPE,
+    value: type
+  }
+}
+
+export const clearAllAction = () => {
+  return {
+    type: ActionTypes.TODOS_CLEAR_ALL
   }
 }

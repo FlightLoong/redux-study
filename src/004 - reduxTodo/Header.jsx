@@ -4,29 +4,6 @@ import { connect } from 'react-redux'
 import * as Actions from './store/ActionCreate.js'
 
 class Header extends React.Component {
-
-  state = {
-    etitle: ''
-  }
-
-  // // 输入最新的任务
-  // onKeyUpHandle = (e) => {
-  //   if (e.keyCode === 13) {
-  //     this.props.addTask(this.state.etitle)
-
-  //     this.setState({
-  //       etitle: ''
-  //     })
-  //   }
-  // }
-
-  // // 获取最新输入的任务
-  // valueChange = (e) => {
-  //   this.setState({
-  //     etitle: e.target.value
-  //   })
-  // }
-
   render() {
     const { addTask } = this.props
     return (
