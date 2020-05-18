@@ -1,9 +1,8 @@
 import React from 'react'
-
 // 导入组件
-import Header from './Header.jsx'
-import List from './List.jsx'
-import Footer from './Footer.jsx'
+import Header from './container/HeaderContainer.js'
+import List from './container/ListContainer.js'
+import Footer from './container/FooterContainer.js'
 
 // 导入 todoList 默认的样式
 import 'todomvc-common/base.css'

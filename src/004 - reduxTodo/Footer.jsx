@@ -1,8 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import * as Actions from './store/ActionCreate.js'
 
-class Footer extends React.Component {
+export default class Footer extends React.Component {
   render() {
     let { num, currentType, toggleType, clearAll } = this.props
     // let { currentType } = this.state
@@ -27,34 +25,3 @@ class Footer extends React.Component {
     )
   }
 }
-
-function mapStateToProps (state) {
-  let num = 0
-  state.todos.forEach(item => {
-    if (!item.done) {
-      num += 1
-    }
-  })
-  return {
-    num,
-    currentType: state.currentType
-  }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    toggleType: (e) => {
-      let type = e.target.dataset.type
-      let action = Actions.toggleTypeAction(type)
-      // console.log(action)
-      dispatch(action)
-    },
-
-    clearAll: () => {
-      let action = Actions.clearAllAction()
-      dispatch(action)
-    }
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Footer)
