@@ -6,22 +6,18 @@ import reducer from './Reducer.js'
 
 let initValue = {
   currentType: 'all',
-  todos: [
-    {
-      id: 1,
-      etitle: '写代码',
-      done: false,
-      isEdit: false
-    },
-    {
-      id: 2,
-      etitle: '听歌',
-      done: true,
-      isEdit: false
-    }
-  ]
+  todos: []
+}
+
+let todos = localStorage.getItem('todos')
+if (todos) {
+  initValue = JSON.parse(todos)
 }
 
 const store = createStore(reducer, initValue)
+
+store.subscribe(() => {
+  localStorage.setItem('todos', JSON.stringify(store.getState()))
+})
 
 export default store
